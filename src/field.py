@@ -14,7 +14,7 @@ class PieceList:
     # two-dimensional semiboolean fields for the field itself, each
     # part of the list being one step in the rotation of the piece.
     self.piecelist = []
-    pieces = open("pieces.txt", "r").read().split("\n\n")
+    pieces = open("../data/pieces.txt", "r").read().split("\n\n")
     for p in (a.split("\n") for a in pieces):
       clr = [int(a) for a in p[0].split(" ")]
       if p[-1] != "":
@@ -69,19 +69,19 @@ class GameField:
     for xip in range(0, len(self.piece[self.paf])):
       # y coordinate in piece
       for yip in range(0, len(self.piece[self.paf][xip])):
-        
+
         # x and y coordinates in field
         xif = self.px + xip
         yif = self.py + yip
-        
+
         # no need to check for collisions on empty spaces!
         if self.piece[paf][xip][yip] == 0:
           continue
-        
+
         # is the piece outside of the playing field?
         if xif < 0 or xif > self.sx or yif < 0 or yif > self.sy:
           return true
-        
+
         if self.field[xif][yif] != 0:
           return true
 
