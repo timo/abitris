@@ -8,6 +8,9 @@
 
 import random
 
+class GameOver(Exception):
+  pass
+
 class PieceList:
   def __init__(self):
     # the piecelist is a three-dimensional array, containing a list of 
@@ -40,14 +43,14 @@ class PieceList:
 
   def getPiece(self):
     return random.choice(self.piecelist)
-    
+
 pl = PieceList()
 
 class GameField:
   def __init__(self):
     self.sx = 11
     self.sy = 20
-    
+
     self.newPiece()
 
     # access to the field is field[y][x].
@@ -56,6 +59,8 @@ class GameField:
     self.field = [[0 for i in range(self.sx)] for j in range(self.sy)]
 
   def newPiece(self):
+    """selects a new piece from the PieceList and drops it into
+the game field"""
     # this is the current piece, fetched from the piecelist and initialised
     # with a random color.
     self.piece = pl.getPiece()
@@ -72,11 +77,15 @@ class GameField:
 
   def checkField(self):
     """checks for full lines and erases them"""
+    erased = []
     for i in range(self.sy - 1, 0, -1):
       if self.field[i] == [1] * self.sx:
+        erased.append(i + len(erased))
         for j in range(i, 1, -1):
           self.field[j] = self.field[j - 1][:]
         self.field[0] = [0] * self.sx
+    
+    return erased
 
   def collides(self, newx, newy, newpaf):
     """checks the position of the piece against the field boundaries and
@@ -124,6 +133,7 @@ returns False, if the rotation couldn't be carried out."""
       return False
 
   def combinedField(self):
+    """returns the field together with the floating piece."""
     a = [a[:] for a in self.field]
 
     # x coordinate in piece
@@ -136,6 +146,10 @@ returns False, if the rotation couldn't be carried out."""
     return a
 
   def dropPiece(self):
+    """combines the floating piece with the field, checks for lines to be
+erased, wether or not the game should be over, and finally generates a new
+piece."""
     self.field = self.combinedField()
-    self.checkField()
+    if not self.checkField() and self.py == 0:
+      raise GameOver
     self.newPiece()
