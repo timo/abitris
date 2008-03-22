@@ -61,8 +61,8 @@ class GameField:
     self.piece = pl.getPiece()
 
     # the X and Y coordinates of the piece.
-    self.px = 0
-    self.py = 0
+    self.px = 1
+    self.py = 1
     # the animation frame of the piece (rotation actually)
     self.paf = random.randrange(0, len(self.piece))
     # piece color
@@ -86,7 +86,7 @@ content."""
           continue
 
         # is the piece outside of the playing field?
-        if xif < 0 or xif > self.sx or yif < 0 or yif > self.sy:
+        if xif < 0 or xif > self.sx - 1 or yif < 0 or yif > self.sy - 1:
           return True
 
         if self.field[yif][xif] != 0:
@@ -107,14 +107,14 @@ returns False, if the move couldn't be carried out"""
   def rotate(self, dir):
     """tries to rotate the piece. +1 means to the right, -1 means to the left.
 returns False, if the rotation couldn't be carried out.""" 
-    if not self.collides(self.px, self.py, self.paf + dir):
-      self.paf += dir
+    if not self.collides(self.px, self.py, (self.paf + dir) % len(self.piece)):
+      self.paf = (self.paf + dir) % len(self.piece)
       return True
     else:
       return False
 
   def combinedField(self):
-    a = self.field
+    a = [a[:] for a in self.field]
 
     # x coordinate in piece
     for yip in range(0, len(self.piece[self.paf])):

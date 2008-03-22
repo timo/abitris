@@ -10,7 +10,7 @@ gf = field.GameField()
 
 def printGameField():
   for lin in gf.combinedField():
-    print "".join(str(x) for x in lin)
+    print "".join(str(y) for y in lin).replace("0", ".")
 
 running = True
 while running:
@@ -19,21 +19,20 @@ while running:
   print
   printGameField()
 
-#===============================================================================
-#  (inp, null, null2) = select((sys.stdin), (), (), 0.1)
-#  print inp
-#  if len(inp) > 0:
-#    key = sys.stdin.read()
-#    
-#    if key == "a":
-#      gf.move(-1, 0)
-#    elif key == "s":
-#      gf.move(0, 1)
-#    elif key == "d":
-#      gf.move(1, 0)
-#===============================================================================
+  key = sys.stdin.read(1)
+    
+  if key == "a":
+    gf.move(-1, 0)
+  elif key == "s":
+    gf.move(0, 1)
+  elif key == "d":
+    gf.move(1, 0)
+  elif key == "q":
+    gf.rotate(-1)
+  elif key == "e":
+    gf.rotate(1)
 
   if not gf.move(0, 1):
     gf.dropPiece()
 
-  time.sleep(1)
+  time.sleep(0.1)
