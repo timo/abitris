@@ -23,7 +23,9 @@ class PieceList:
         rows = len(p) - 2
       cols = len(p[1].split(" ")[0])
       animframes = len(p[1].split(" "))
-      piece = [[ [ 0 for i in range(0, rows)] for j in range(0, cols)] for k in range(0, animframes)]
+      piece = [[ [ 0 for i in range(0, rows)]
+                  for j in range(0, cols)]
+                  for k in range(0, animframes)]
       li = 0 # line index
       for l in p[1:rows + 1]:
         afi = 0 # Animation Frame Index
@@ -36,53 +38,93 @@ class PieceList:
 
       self.piecelist.append(piece)
 
+  def getPiece(self):
+    return random.choice(self.piecelist)
+    
 pl = PieceList()
-
-class Piece:
-  def __init__(self):
-    self.geometry = random.choice(pl.piecelist)
-    self.rotation = random.randint(len(self.geometry) - 1)
 
 class GameField:
   def __init__(self):
     self.sx = 11
     self.sy = 20
+    
+    self.newPiece()
 
+    # access to the field is field[y][x].
+    # the field content is a color or maybe a color index of a palette
+    # or something.
+    self.field = [[0 for i in range(self.sx)] for j in range(self.sy)]
+
+  def newPiece(self):
     # this is the current piece, fetched from the piecelist and initialised
     # with a random color.
-    self.piece = []
-    
+    self.piece = pl.getPiece()
+
     # the X and Y coordinates of the piece.
     self.px = 0
     self.py = 0
     # the animation frame of the piece (rotation actually)
-    self.paf = 0
+    self.paf = random.randrange(0, len(self.piece))
+    # piece color
+    self.pc = 1
 
-    # access to the field is field[x][y].
-    # the field content is a color or maybe a color index of a palette or something.
-    self.field = [[0 for i in range(self.sy)] for j in range(self.sx)]
-
-  def collides(self, newx, newy):
-    """checks the position of the piece against the field boundaries and content."""
+  def collides(self, newx, newy, newpaf):
+    """checks the position of the piece against the field boundaries and
+content."""
     # iterate all fields in the current piece
     # x coordinate in piece
-    for xip in range(0, len(self.piece[self.paf])):
+    for yip in range(0, len(self.piece[newpaf])):
       # y coordinate in piece
-      for yip in range(0, len(self.piece[self.paf][xip])):
+      for xip in range(0, len(self.piece[newpaf][yip])):
 
         # x and y coordinates in field
-        xif = self.px + xip
-        yif = self.py + yip
+        xif = newx + xip
+        yif = newy + yip
 
         # no need to check for collisions on empty spaces!
-        if self.piece[paf][xip][yip] == 0:
+        if self.piece[newpaf][yip][xip] == 0:
           continue
 
         # is the piece outside of the playing field?
         if xif < 0 or xif > self.sx or yif < 0 or yif > self.sy:
-          return true
+          return True
 
-        if self.field[xif][yif] != 0:
-          return true
+        if self.field[yif][xif] != 0:
+          return True
 
-    return false
+    return False
+
+  def move(self, dx, dy):
+    """tries to move the piece by (dx|dy).
+returns False, if the move couldn't be carried out"""
+    if not self.collides(self.px + dx, self.py + dy, self.paf):
+      self.px += dx
+      self.py += dy
+      return True
+    else:
+      return False
+
+  def rotate(self, dir):
+    """tries to rotate the piece. +1 means to the right, -1 means to the left.
+returns False, if the rotation couldn't be carried out.""" 
+    if not self.collides(self.px, self.py, self.paf + dir):
+      self.paf += dir
+      return True
+    else:
+      return False
+
+  def combinedField(self):
+    a = self.field
+
+    # x coordinate in piece
+    for yip in range(0, len(self.piece[self.paf])):
+      # y coordinate in piece
+      for xip in range(0, len(self.piece[self.paf][yip])):
+        if self.piece[self.paf][yip][xip] != 0:
+          a[self.py + yip][self.px + xip] = self.pc
+
+    return a
+
+  def dropPiece(self):
+    self.field = self.combinedField()
+    self.newPiece()
