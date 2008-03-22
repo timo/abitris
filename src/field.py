@@ -60,13 +60,23 @@ class GameField:
     # with a random color.
     self.piece = pl.getPiece()
 
-    # the X and Y coordinates of the piece.
-    self.px = 1
-    self.py = 1
     # the animation frame of the piece (rotation actually)
     self.paf = random.randrange(0, len(self.piece))
+
+    # the X and Y coordinates of the piece.
+    self.px = (self.sx - len(self.piece[self.paf][0])) / 2
+    self.py = 0
+
     # piece color
     self.pc = 1
+
+  def checkField(self):
+    """checks for full lines and erases them"""
+    for i in range(self.sy - 1, 0, -1):
+      if self.field[i] == [1] * self.sx:
+        for j in range(i, 1, -1):
+          self.field[j] = self.field[j - 1][:]
+        self.field[0] = [0] * self.sx
 
   def collides(self, newx, newy, newpaf):
     """checks the position of the piece against the field boundaries and
@@ -127,4 +137,5 @@ returns False, if the rotation couldn't be carried out."""
 
   def dropPiece(self):
     self.field = self.combinedField()
+    self.checkField()
     self.newPiece()

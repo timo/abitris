@@ -10,7 +10,7 @@ gf = field.GameField()
 
 def printGameField():
   for lin in gf.combinedField():
-    print "".join(str(y) for y in lin).replace("0", ".")
+    print "".join(str(y) for y in lin).replace("0", ".").replace("1", "O")
 
 running = True
 while running:
