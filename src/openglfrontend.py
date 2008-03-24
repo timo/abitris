@@ -32,6 +32,7 @@ def init():
   # some OpenGL magic!
   glEnable(GL_BLEND)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
+  glEnable(GL_DEPTH_TEST)
   #glEnable(GL_LINE_SMOOTH)
   #glEnable(GL_TEXTURE_2D)
   glClearColor(0.8,0.9,1.0,1.0)
@@ -51,6 +52,13 @@ def quad(x, y):
   
   glPopMatrix()
 
+def line(x1, y1, x2, y2):
+  glBegin(GL_LINES)
+
+  glVertex3i(x1, y1, 1)
+  glVertex3i(x2, y2, 1)  
+
+  glEnd()
 
 def rungame():
   init()
@@ -92,23 +100,32 @@ def rungame():
 
       glTranslatef(0.5, 0.5, 0)
 
-      y = 0
-      for r in gf.combinedField():
-        x = 0
-        for c in r:
-          if c != 0:
-            glColor(*c)
+      tf = gf.combinedField()
+      for y in range(gf.sy):
+        for x in range(gf.sx):
+          if tf[y][x] != 0:
+            glColor(*tf[y][x])
             quad(x, y)
-          x += 1
-        y += 1
+            glColor(0, 0, 0)
+            if x < gf.sx - 1 and tf[y][x + 1] != tf[y][x]:
+              line(x + 1, y, x + 1, y + 1)
+            if y < gf.sy - 1 and tf[y+1][x] != tf[y][x]:
+              line(x, y + 1, x + 1, y + 1)
+          else:
+            glColor(0, 0, 0)
+            if x < gf.sx - 1 and tf[y][x + 1] != 0:
+              line(x + 1, y, x + 1, y + 1)
+            if y < gf.sy - 1 and tf[y+1][x] != 0:
+              line(x, y + 1, x + 1, y + 1)
+      
 
       glColor3f(0, 0, 0)
       glBegin(GL_LINE_LOOP)
-      
-      glVertex2i(0, 0)
-      glVertex2i(gf.sx, 0)
-      glVertex2i(gf.sx, gf.sy)
-      glVertex2i(0, gf.sy)
+
+      glVertex3i(0, 0, 1)
+      glVertex3i(gf.sx, 0, 1)
+      glVertex3i(gf.sx, gf.sy, 1)
+      glVertex3i(0, gf.sy, 1)
 
       glEnd()
 
