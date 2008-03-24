@@ -162,7 +162,12 @@ def rungame():
     textthing.draw()
     glPopMatrix()
 
-
+  inputsys = {K_LEFT:  [gf.move,   [-1, 0], time.time()],
+              K_RIGHT: [gf.move,   [ 1, 0], time.time()],
+              K_DOWN:  [gf.move,   [ 0, 1], time.time()],
+              K_a:     [gf.rotate, [-1],    time.time()],
+              K_d:     [gf.rotate, [ 1],    time.time()]}
+  inputdelay = 0.15
 
   try:
     running = True
@@ -170,17 +175,11 @@ def rungame():
       for event in pygame.event.get():
         if event.type == QUIT:
           running = False
-        elif event.type == KEYDOWN:
-          if event.key == K_LEFT:
-            gf.move(-1, 0)
-          elif event.key == K_RIGHT:
-            gf.move(1, 0)
-          elif event.key == K_DOWN:
-            gf.move(0, 1)
-          elif event.key == K_a:
-            gf.rotate(-1)
-          elif event.key == K_d:
-            gf.rotate(1)
+      
+      for thekey in inputsys.keys():
+        if pygame.key.get_pressed()[thekey] and time.time() > inputsys[thekey][2] + inputdelay:
+          inputsys[thekey][0](*inputsys[thekey][1])
+          inputsys[thekey][2] = time.time()  
 
       if time.time() > lastdrop + dropdelay:
         lastdrop = time.time()
