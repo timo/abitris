@@ -248,6 +248,8 @@ def rungame():
             bonuszeit = time.time()
             bonusdisplay.renderText("%s%i" % (["", "+"][gf.playerscore - altepunkte > 0], gf.playerscore - altepunkte))
 
+            lastdrop = time.time()
+
           scoredisplay.renderText("%i Punkte" % gf.playerscore)
           linesdisplay.renderText("%i Zeilen" % gf.linescleared)
 
