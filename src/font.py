@@ -10,9 +10,13 @@ class Text:
   def __init__(self, thetext):
     self.glID = None
     self.rgba = (1., 1., 1., 1.)
+    self.currenttext = None
     self.renderText(thetext)
 
   def renderText(self, thetext):
+    if self.currenttext == thetext:
+      return False
+    self.currenttext = thetext
     text = thefont.render(thetext, True, (255, 255, 255)).convert_alpha()
     npo2 = lambda x: int(2 ** ceil(log(x, 2)))
     (w, h) = (npo2(text.get_width()), npo2(text.get_height()))
