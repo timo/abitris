@@ -2,7 +2,9 @@ from OpenGL.GL import *
 import pygame
 from pygame.locals import *
 from font import Text
-from time import sleep
+import time 
+
+import field
 
 # don't initialise sound stuff plzkthxbai
 pygame.mixer = None
@@ -34,18 +36,78 @@ def init():
   glEnable(GL_TEXTURE_2D)
   glClearColor(0.8,0.9,1.0,1.0)
 
+def quad(x, y):
+  glPushMatrix()
+  
+  glTranslatef(x, y, 0)
+  glBegin(GL_QUADS)
+
+  glVertex2i(0, 0)
+  glVertex2i(0, 1)
+  glVertex2i(1, 1)
+  glVertex2i(1, 0)
+
+  glEnd()
+  
+  glPopMatrix()
+
+
 def rungame():
   init()
   
-  running = True
-  while running:
-    for event in pygame.event.get():
-      if event.type == QUIT:
-        running = False
-    # handle events
-    # handle game
-    # render gamefield
-    # render GUI
-    sleep(0.1)
+  gf = field.GameField()
+  gf.colors = [(1, 0, 0), (1, 1, 0), (1, 0, 1), (0, 1, 1), (0, 1, 0), (0, 0, 1)]
+  gf.newPiece()
+
+  lastdrop = time.time()
+  dropdelay = 1
+
+  try:
+    running = True
+    while running:
+      for event in pygame.event.get():
+        if event.type == QUIT:
+          running = False
+        elif event.type == KEYDOWN:
+          if event.key == K_LEFT:
+            gf.move(-1, 0)
+          elif event.key == K_RIGHT:
+            gf.move(1, 0)
+          elif event.key == K_DOWN:
+            gf.move(0, 1)
+          elif event.key == K_a:
+            gf.rotate(-1)
+          elif event.key == K_d:
+            gf.rotate(1)
+  
+      if time.time() > lastdrop + dropdelay:
+        lastdrop = time.time()
+        if not gf.move(0, 1):
+          gf.dropPiece()
+
+      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+      glLoadIdentity()
+
+      y = 0
+      for r in gf.combinedField():
+        x = 0
+        for c in r:
+          if c != 0:
+            glColor(*c)
+            quad(x, y)
+          x += 1
+        y += 1
+
+      # render GUI
+      
+      
+      pygame.display.flip()
+    
+      time.sleep(0.05)
+
+  except field.GameOver:
+    pass # TODO: implement some game-over stuff
   
   pygame.quit
+
+rungame()

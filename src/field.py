@@ -51,6 +51,8 @@ class GameField:
     self.sx = 11
     self.sy = 20
 
+    self.colors = [1]
+
     self.newPiece()
 
     # access to the field is field[y][x].
@@ -65,6 +67,9 @@ the game field"""
     # with a random color.
     self.piece = pl.getPiece()
 
+    # piece color
+    self.pc = random.choice(self.colors)
+
     # the animation frame of the piece (rotation actually)
     self.paf = random.randrange(0, len(self.piece))
 
@@ -72,14 +77,11 @@ the game field"""
     self.px = (self.sx - len(self.piece[self.paf][0])) / 2
     self.py = 0
 
-    # piece color
-    self.pc = 1
-
   def checkField(self):
     """checks for full lines and erases them"""
     erased = []
     for i in range(self.sy - 1, 0, -1):
-      if self.field[i] == [1] * self.sx:
+      if False not in [0 != a for a in self.field[i]]:
         erased.append(i + len(erased))
         for j in range(i, 1, -1):
           self.field[j] = self.field[j - 1][:]
