@@ -32,8 +32,8 @@ def init():
   # some OpenGL magic!
   glEnable(GL_BLEND)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
-  glEnable(GL_LINE_SMOOTH)
-  glEnable(GL_TEXTURE_2D)
+  #glEnable(GL_LINE_SMOOTH)
+  #glEnable(GL_TEXTURE_2D)
   glClearColor(0.8,0.9,1.0,1.0)
 
 def quad(x, y):
@@ -79,7 +79,7 @@ def rungame():
             gf.rotate(-1)
           elif event.key == K_d:
             gf.rotate(1)
-  
+
       if time.time() > lastdrop + dropdelay:
         lastdrop = time.time()
         if not gf.move(0, 1):
@@ -87,6 +87,10 @@ def rungame():
 
       glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
       glLoadIdentity()
+
+      glPushMatrix()
+
+      glTranslatef(0.5, 0.5, 0)
 
       y = 0
       for r in gf.combinedField():
@@ -98,16 +102,28 @@ def rungame():
           x += 1
         y += 1
 
+      glColor3f(0, 0, 0)
+      glBegin(GL_LINE_LOOP)
+      
+      glVertex2i(0, 0)
+      glVertex2i(gf.sx, 0)
+      glVertex2i(gf.sx, gf.sy)
+      glVertex2i(0, gf.sy)
+
+      glEnd()
+
+      glPopMatrix()
+
       # render GUI
-      
-      
+
+
       pygame.display.flip()
-    
+
       time.sleep(0.05)
 
   except field.GameOver:
     pass # TODO: implement some game-over stuff
-  
+
   pygame.quit
 
 rungame()
