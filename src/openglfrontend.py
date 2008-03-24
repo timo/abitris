@@ -11,7 +11,6 @@ pygame.mixer = None
 
 screensize = (1024, 768)
 
-
 class Texture:
   def __init__(self, texturename):
     self.name = texturename
@@ -111,9 +110,59 @@ def rungame():
   piecetex = Texture("bg")
 
   lastdrop = time.time()
-  dropdelay = 0.5
+  dropdelay = 0.3
 
   textthing = Text("welcome to abitris")
+
+
+  def drawStuff(tf):
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+    glLoadIdentity()
+    glPushMatrix()
+    glTranslatef(0.5, 0.5, 0)
+    piecetex.bind()
+
+    for y in range(gf.sy):
+      for x in range(gf.sx):
+        if tf[y][x] != 0:
+          glColor(*tf[y][x])
+          glEnable(GL_TEXTURE_2D)
+          quad(x, y)
+          glDisable(GL_TEXTURE_2D)
+          glColor(1, 1, 1)
+          if x < gf.sx - 1 and tf[y][x + 1] != tf[y][x]:
+            line(x + 1, y, x + 1, y + 1)
+          
+          if y < gf.sy - 1 and tf[y + 1][x] != tf[y][x]:
+            line(x, y + 1, x + 1, y + 1)
+  
+        else:
+          glColor(1, 1, 1)
+          if x < gf.sx - 1 and tf[y][x + 1] != 0:
+            line(x + 1, y, x + 1, y + 1)
+          
+          if y < gf.sy - 1 and tf[y + 1][x] != 0:
+            line(x, y + 1, x + 1, y + 1)
+
+    glColor3f(1, 1, 1)
+
+    glBegin(GL_LINE_LOOP)
+    glVertex3i(0, 0, 1)
+    glVertex3i(gf.sx, 0, 1)
+    glVertex3i(gf.sx, gf.sy, 1)
+    glVertex3i(0, gf.sy, 1)
+    glEnd()
+
+    glPopMatrix()
+
+    # render GUI
+    glPushMatrix()
+    glScalef(1 / 32., 1 / 32., 1 / 32.)
+    glTranslatef(12, 0, 0)
+    textthing.draw()
+    glPopMatrix()
+
+
 
   try:
     running = True
@@ -136,60 +185,26 @@ def rungame():
       if time.time() > lastdrop + dropdelay:
         lastdrop = time.time()
         if not gf.move(0, 1):
-          gf.dropPiece()
+          oldfield = gf.combinedField()
+          deletedlines = gf.dropPiece()
+          
+          if deletedlines:
+            fl = min(deletedlines)
+            for x in range(gf.sx * 3):
+              for l in deletedlines:
+                for zx in range(max(0, min(x - l + fl, gf.sx))):
+                  oldfield[l][zx] = map(lambda a: int(max(0, min(a*0.75, a - 0.1)) * 100) / 100., oldfield[l][zx])
+                  if oldfield[l][zx] == (0, 0, 0):
+                    oldfield[l][zx] = [0]
 
-      glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-      glLoadIdentity()
+              drawStuff(oldfield)
+              pygame.display.flip()
+              time.sleep(0.025)
 
-      glPushMatrix()
-
-      glTranslatef(0.5, 0.5, 0)
-
-      piecetex.bind()
-
-      tf = gf.combinedField()
-      for y in range(gf.sy):
-        for x in range(gf.sx):
-          if tf[y][x] != 0:
-            glColor(*tf[y][x])
-            glEnable(GL_TEXTURE_2D)
-            quad(x, y)
-            glDisable(GL_TEXTURE_2D)
-            glColor(1, 1, 1)
-            if x < gf.sx - 1 and tf[y][x + 1] != tf[y][x]:
-              line(x + 1, y, x + 1, y + 1)
-            if y < gf.sy - 1 and tf[y+1][x] != tf[y][x]:
-              line(x, y + 1, x + 1, y + 1)
-          else:
-            glColor(1, 1, 1)
-            if x < gf.sx - 1 and tf[y][x + 1] != 0:
-              line(x + 1, y, x + 1, y + 1)
-            if y < gf.sy - 1 and tf[y+1][x] != 0:
-              line(x, y + 1, x + 1, y + 1)
-
-
-      glColor3f(1, 1, 1)
-      glBegin(GL_LINE_LOOP)
-
-      glVertex3i(0, 0, 1)
-      glVertex3i(gf.sx, 0, 1)
-      glVertex3i(gf.sx, gf.sy, 1)
-      glVertex3i(0, gf.sy, 1)
-
-      glEnd()
-
-      glPopMatrix()
-
-      # render GUI
-      glPushMatrix()
-      glScalef(1 / 32., 1 / 32., 1 / 32.)
-      glTranslatef(12, 0, 0)
-      textthing.draw()
-      glPopMatrix()
-
+      drawStuff(gf.combinedField())
       pygame.display.flip()
 
-      time.sleep(0.05)
+      time.sleep(0.01)
 
   except field.GameOver:
     pass # TODO: implement some game-over stuff

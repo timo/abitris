@@ -83,7 +83,7 @@ the game field"""
     i = self.sy - 1
     while i > 0:
       if False not in [0 != a for a in self.field[i]]:
-        erased.append(i + len(erased))
+        erased.append(i - len(erased))
         for j in range(i, 1, -1):
           self.field[j] = self.field[j - 1][:]
         self.field[0] = [0] * self.sx
@@ -155,6 +155,8 @@ returns False, if the rotation couldn't be carried out."""
 erased, wether or not the game should be over, and finally generates a new
 piece."""
     self.field = self.combinedField()
-    if not self.checkField() and self.py == 0:
+    res = self.checkField()
+    if not res and self.py == 0:
       raise GameOver
     self.newPiece()
+    return res
