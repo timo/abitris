@@ -70,20 +70,21 @@ def quad(x, y):
   glEnable(GL_TEXTURE_2D)
   
   t = (time.time() / 100) % 1 
+  z = 0.09
 
   glTranslatef(x, y, 0)
   glBegin(GL_QUADS)
 
-  glTexCoord2f(x * 0.05, y * 0.05 + t)
+  glTexCoord2f(x * z, y * z + t)
   glVertex2i(0, 0)
 
-  glTexCoord2f(x * 0.05, y * 0.05 + 0.05 + t)
+  glTexCoord2f(x * z, y * z + z + t)
   glVertex2i(0, 1)
 
-  glTexCoord2f(x * 0.05 + 0.05, y * 0.05 + 0.05 + t)
+  glTexCoord2f(x * z + z, y * z + z + t)
   glVertex2i(1, 1)
 
-  glTexCoord2f(x * 0.05 + 0.05, y * 0.05 + t)
+  glTexCoord2f(x * z + z, y * z + t)
   glVertex2i(1, 0)
 
   glEnd()
@@ -110,7 +111,9 @@ def rungame():
   piecetex = Texture("bg")
 
   lastdrop = time.time()
-  dropdelay = 1
+  dropdelay = 0.5
+
+  textthing = Text("welcome to abitris")
 
   try:
     running = True
@@ -142,12 +145,16 @@ def rungame():
 
       glTranslatef(0.5, 0.5, 0)
 
+      piecetex.bind()
+
       tf = gf.combinedField()
       for y in range(gf.sy):
         for x in range(gf.sx):
           if tf[y][x] != 0:
             glColor(*tf[y][x])
+            glEnable(GL_TEXTURE_2D)
             quad(x, y)
+            glDisable(GL_TEXTURE_2D)
             glColor(1, 1, 1)
             if x < gf.sx - 1 and tf[y][x + 1] != tf[y][x]:
               line(x + 1, y, x + 1, y + 1)
@@ -174,7 +181,11 @@ def rungame():
       glPopMatrix()
 
       # render GUI
-
+      glPushMatrix()
+      glScalef(1 / 32., 1 / 32., 1 / 32.)
+      glTranslatef(12, 0, 0)
+      textthing.draw()
+      glPopMatrix()
 
       pygame.display.flip()
 
