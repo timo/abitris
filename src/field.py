@@ -64,6 +64,7 @@ class GameField:
     # or something.
     self.field = [[0 for i in range(self.sx)] for j in range(self.sy)]
 
+    self.linescleared = 0
     self.playerscore = 0
 
   def newPiece(self):
@@ -104,6 +105,7 @@ the game field"""
         i -= 1
 
     self.playerscore += [0, 200, 450, 1000, 2100][len(erased)]
+    self.linescleared += len(erased)
 
     return erased
 
@@ -150,7 +152,17 @@ returns False, if the rotation couldn't be carried out."""
       self.paf = (self.paf + dir) % len(self.piece)
       return True
     else:
-      return False
+      # wiggle!
+      if not self.collides(self.px - 1, self.py, (self.paf + dir) % len(self.piece)):
+        self.px -= 1
+        self.paf = (self.paf + dir) % len(self.piece)
+        return True
+      elif not self.collides(self.px + 1, self.py, (self.paf + dir) % len(self.piece)):
+        self.px += 1
+        self.paf = (self.paf + dir) % len(self.piece)
+        return True
+      else:
+        return False
 
   def combinedField(self, color = None):
     """returns the field together with the floating piece."""

@@ -107,18 +107,19 @@ def rungame():
   init()
 
   gf = field.GameField()
-  gf.colors = [(1, 0, 0), (1, 1, 0), (1, 0, 1), (0, 1, 1), (0, 1, 0), (0, 0, 1)]
+  gf.colors = [(1, 0, 0), (1, 1, 0), (1, 0, 1), (0, 1, 1), (0, 1, 0), (0, 0, 1), (1, 0.7, 0)]
   gf.newPiece()
   gf.newPiece()
 
   piecetex = Texture("bg")
 
   lastdrop = time.time()
-  dropdelay = 0.3
+  dropdelay = 0.5
 
   nextpiece = Text(u"Nächstes Teil")
 
   scoredisplay = Text("0 Punkte")
+  linesdisplay = Text("0 Zeilen")
 
   def drawStuff(tf):
     def drawField(thefield):
@@ -168,8 +169,10 @@ def rungame():
     glTranslate(12, 0, 0)
     glScalef(1 / 32., 1 / 32., 1 / 32.)
     nextpiece.draw()
-    glTranslate(0, 6 * 32, 0)
+    glTranslate(0, 7 * 32, 0)
     scoredisplay.draw()
+    glTranslate(0, 32, 0)
+    linesdisplay.draw()
     glPopMatrix()
 
     # render next piece
@@ -226,8 +229,9 @@ def rungame():
               drawStuff(oldfield)
               pygame.display.flip()
               time.sleep(0.025)
-          
+
           scoredisplay.renderText("%i Punkte" % gf.playerscore)
+          linesdisplay.renderText("%i Zeilen" % gf.linescleared)
 
       drawStuff(gf.combinedField( map(lambda col: col * (math.sin(time.time() * 3) + 1.25), gf.pc )))
       pygame.display.flip()
