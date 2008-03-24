@@ -1,3 +1,4 @@
+# -*- coding: utf8 -*-
 from OpenGL.GL import *
 import pygame
 from pygame.locals import *
@@ -5,6 +6,8 @@ from font import Text
 import time 
 
 import field
+import random
+import math
 
 # don't initialise sound stuff plzkthxbai
 pygame.mixer = None
@@ -112,37 +115,40 @@ def rungame():
   lastdrop = time.time()
   dropdelay = 0.3
 
-  textthing = Text("welcome to abitris")
+  textthing = Text(u"Nächstes Teil")
 
 
   def drawStuff(tf):
+    def drawField(thefield):
+      for y in range(len(thefield)):
+        for x in range(len(thefield[y])):
+          if thefield[y][x] != 0:
+            glColor(*thefield[y][x])
+            glEnable(GL_TEXTURE_2D)
+            quad(x, y)
+            glDisable(GL_TEXTURE_2D)
+            glColor(1, 1, 1)
+            if x < len(thefield[y]) - 1 and thefield[y][x + 1] != thefield[y][x]:
+              line(x + 1, y, x + 1, y + 1)
+
+            if y < len(thefield) - 1 and thefield[y + 1][x] != thefield[y][x]:
+              line(x, y + 1, x + 1, y + 1)
+
+          else:
+            glColor(1, 1, 1)
+            if x < len(thefield[y]) - 1 and thefield[y][x + 1] != 0:
+              line(x + 1, y, x + 1, y + 1)
+
+            if y < len(thefield) - 1 and thefield[y + 1][x] != 0:
+              line(x, y + 1, x + 1, y + 1)
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glLoadIdentity()
     glPushMatrix()
     glTranslatef(0.5, 0.5, 0)
     piecetex.bind()
 
-    for y in range(gf.sy):
-      for x in range(gf.sx):
-        if tf[y][x] != 0:
-          glColor(*tf[y][x])
-          glEnable(GL_TEXTURE_2D)
-          quad(x, y)
-          glDisable(GL_TEXTURE_2D)
-          glColor(1, 1, 1)
-          if x < gf.sx - 1 and tf[y][x + 1] != tf[y][x]:
-            line(x + 1, y, x + 1, y + 1)
-          
-          if y < gf.sy - 1 and tf[y + 1][x] != tf[y][x]:
-            line(x, y + 1, x + 1, y + 1)
-  
-        else:
-          glColor(1, 1, 1)
-          if x < gf.sx - 1 and tf[y][x + 1] != 0:
-            line(x + 1, y, x + 1, y + 1)
-          
-          if y < gf.sy - 1 and tf[y + 1][x] != 0:
-            line(x, y + 1, x + 1, y + 1)
+    drawField(tf)
 
     glColor3f(1, 1, 1)
 
@@ -157,8 +163,8 @@ def rungame():
 
     # render GUI
     glPushMatrix()
-    glScalef(1 / 32., 1 / 32., 1 / 32.)
     glTranslatef(12, 0, 0)
+    glScalef(1 / 32., 1 / 32., 1 / 32.)
     textthing.draw()
     glPopMatrix()
 
@@ -200,7 +206,7 @@ def rungame():
               pygame.display.flip()
               time.sleep(0.025)
 
-      drawStuff(gf.combinedField())
+      drawStuff(gf.combinedField( map(lambda col: col * (math.sin(time.time() * 3) + 1.25), gf.pc )))
       pygame.display.flip()
 
       time.sleep(0.01)

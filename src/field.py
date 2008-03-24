@@ -137,7 +137,7 @@ returns False, if the rotation couldn't be carried out."""
     else:
       return False
 
-  def combinedField(self):
+  def combinedField(self, color = None):
     """returns the field together with the floating piece."""
     a = [a[:] for a in self.field]
 
@@ -146,7 +146,7 @@ returns False, if the rotation couldn't be carried out."""
       # y coordinate in piece
       for xip in range(0, len(self.piece[self.paf][yip])):
         if self.piece[self.paf][yip][xip] != 0:
-          a[self.py + yip][self.px + xip] = self.pc
+          a[self.py + yip][self.px + xip] = color or self.pc
 
     return a
 
