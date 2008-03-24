@@ -53,6 +53,10 @@ class GameField:
 
     self.colors = [1]
 
+    # fill the stack first
+    self.npiece, self.npc, self.npaf, self.npx, self.npy = 0, 0, 0, 0, 0
+    self.newPiece()
+    # then put the piece onto the field.
     self.newPiece()
 
     # access to the field is field[y][x].
@@ -63,19 +67,26 @@ class GameField:
   def newPiece(self):
     """selects a new piece from the PieceList and drops it into
 the game field"""
+    # get the next piece.
+    self.piece = self.npiece
+    self.pc = self.npc
+    self.paf = self.npaf
+    self.px = self.npx
+    self.py = self.npy
+
     # this is the current piece, fetched from the piecelist and initialised
     # with a random color.
-    self.piece = pl.getPiece()
+    self.npiece = pl.getPiece()
 
     # piece color
-    self.pc = random.choice(self.colors)
+    self.npc = random.choice(self.colors)
 
     # the animation frame of the piece (rotation actually)
-    self.paf = random.randrange(0, len(self.piece))
+    self.npaf = random.randrange(0, len(self.npiece))
 
     # the X and Y coordinates of the piece.
-    self.px = (self.sx - len(self.piece[self.paf][0])) / 2
-    self.py = 0
+    self.npx = (self.sx - len(self.npiece[self.npaf][0])) / 2
+    self.npy = 0
 
   def checkField(self):
     """checks for full lines and erases them"""

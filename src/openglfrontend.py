@@ -70,7 +70,7 @@ def quad(x, y):
   glPushMatrix()
 
   glEnable(GL_TEXTURE_2D)
-  
+
   t = (time.time() / 100) % 1 
   z = 0.09
 
@@ -90,7 +90,7 @@ def quad(x, y):
   glVertex2i(1, 0)
 
   glEnd()
-  
+
   glDisable(GL_TEXTURE_2D)
 
   glPopMatrix()
@@ -105,9 +105,10 @@ def line(x1, y1, x2, y2):
 
 def rungame():
   init()
-  
+
   gf = field.GameField()
   gf.colors = [(1, 0, 0), (1, 1, 0), (1, 0, 1), (0, 1, 1), (0, 1, 0), (0, 0, 1)]
+  gf.newPiece()
   gf.newPiece()
 
   piecetex = Texture("bg")
@@ -168,6 +169,24 @@ def rungame():
     textthing.draw()
     glPopMatrix()
 
+    # render next piece
+    glPushMatrix()
+    piecetex.bind()
+    glTranslatef(12, 1, 0)
+    drawField([map( lambda foo: [0, gf.npc][foo], bar) for bar in gf.npiece[gf.npaf]])
+
+    glDisable(GL_TEXTURE_2D)
+
+    glBegin(GL_LINE_LOOP)
+    glVertex3i(0, 0, 1)
+    glVertex3i(len(gf.npiece[gf.npaf]), 0, 1)
+    glVertex3i(len(gf.npiece[gf.npaf]), len(gf.npiece[gf.npaf][0]), 1)
+    glVertex3i(0, len(gf.npiece[gf.npaf][0]), 1)
+    glEnd()
+
+    
+    glPopMatrix()
+
   inputsys = {K_LEFT:  [gf.move,   [-1, 0], time.time()],
               K_RIGHT: [gf.move,   [ 1, 0], time.time()],
               K_DOWN:  [gf.move,   [ 0, 1], time.time()],
@@ -181,18 +200,18 @@ def rungame():
       for event in pygame.event.get():
         if event.type == QUIT:
           running = False
-      
+
       for thekey in inputsys.keys():
         if pygame.key.get_pressed()[thekey] and time.time() > inputsys[thekey][2] + inputdelay:
           inputsys[thekey][0](*inputsys[thekey][1])
-          inputsys[thekey][2] = time.time()  
+          inputsys[thekey][2] = time.time()
 
       if time.time() > lastdrop + dropdelay:
         lastdrop = time.time()
         if not gf.move(0, 1):
           oldfield = gf.combinedField()
           deletedlines = gf.dropPiece()
-          
+
           if deletedlines:
             fl = min(deletedlines)
             for x in range(gf.sx * 3):
