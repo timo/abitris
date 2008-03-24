@@ -72,21 +72,21 @@ def quad(x, y):
   glEnable(GL_TEXTURE_2D)
 
   t = (time.time() / 100) % 1 
-  z = 0.09
+  z = 0.05
 
   glTranslatef(x, y, 0)
   glBegin(GL_QUADS)
 
-  glTexCoord2f(x * z, y * z + t)
+  glTexCoord2f(x * z + 0.1, y * z + t)
   glVertex2i(0, 0)
 
-  glTexCoord2f(x * z, y * z + z + t)
+  glTexCoord2f(x * z + 0.1, y * z + z + t)
   glVertex2i(0, 1)
 
-  glTexCoord2f(x * z + z, y * z + z + t)
+  glTexCoord2f(x * z + z + 0.1, y * z + z + t)
   glVertex2i(1, 1)
 
-  glTexCoord2f(x * z + z, y * z + t)
+  glTexCoord2f(x * z + z + 0.1, y * z + t)
   glVertex2i(1, 0)
 
   glEnd()
@@ -114,12 +114,17 @@ def rungame():
   piecetex = Texture("bg")
 
   lastdrop = time.time()
-  dropdelay = 0.5
+  dropdelay = 0.6
+
+  lastspeedincrease = time.time()
 
   nextpiece = Text(u"Nächstes Teil")
 
   scoredisplay = Text("0 Punkte")
   linesdisplay = Text("0 Zeilen")
+  bonusdisplay = Text("")
+  bonuspos = 0
+  bonuszeit = 0
 
   def drawStuff(tf):
     def drawField(thefield):
@@ -192,11 +197,19 @@ def rungame():
 
     glPopMatrix()
 
-  inputsys = {K_LEFT:  [gf.move,   [-1, 0], time.time()],
+    if time.time() < bonuszeit + 3:
+      glPushMatrix()
+      glTranslatef(gf.sx / 2, bonuspos - (time.time() - bonuszeit), 2)
+      bonusdisplay.rgba = [1, 1, 1, 1. - ((time.time() - bonuszeit) / 3.) ** 2]
+      glScalef(1/16., 1/16., 1)
+      bonusdisplay.draw()
+      glPopMatrix()
+
+  inputsys = {K_a:     [gf.rotate, [-1],    time.time()],
+              K_d:     [gf.rotate, [ 1],    time.time()],
+              K_LEFT:  [gf.move,   [-1, 0], time.time()],
               K_RIGHT: [gf.move,   [ 1, 0], time.time()],
-              K_DOWN:  [gf.move,   [ 0, 1], time.time()],
-              K_a:     [gf.rotate, [-1],    time.time()],
-              K_d:     [gf.rotate, [ 1],    time.time()]}
+              K_DOWN:  [gf.move,   [ 0, 1], time.time()]}
   inputdelay = 0.15
 
   try:
@@ -215,6 +228,7 @@ def rungame():
         lastdrop = time.time()
         if not gf.move(0, 1):
           oldfield = gf.combinedField()
+          altepunkte = gf.playerscore
           deletedlines = gf.dropPiece()
 
           if deletedlines:
@@ -230,6 +244,10 @@ def rungame():
               pygame.display.flip()
               time.sleep(0.025)
 
+            bonuspos = deletedlines[len(deletedlines) / 2]
+            bonuszeit = time.time()
+            bonusdisplay.renderText("%s%i" % (["", "+"][gf.playerscore - altepunkte > 0], gf.playerscore - altepunkte))
+
           scoredisplay.renderText("%i Punkte" % gf.playerscore)
           linesdisplay.renderText("%i Zeilen" % gf.linescleared)
 
@@ -237,6 +255,10 @@ def rungame():
       pygame.display.flip()
 
       time.sleep(0.01)
+      
+      if time.time() > lastspeedincrease + 60:
+        dropdelay *= 0.8
+        lastspeedincrease = time.time()
 
   except field.GameOver:
     pass # TODO: implement some game-over stuff
