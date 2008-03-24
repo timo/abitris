@@ -78,12 +78,15 @@ the game field"""
   def checkField(self):
     """checks for full lines and erases them"""
     erased = []
-    for i in range(self.sy - 1, 0, -1):
+    i = self.sy - 1
+    while i > 0:
       if self.field[i] == [1] * self.sx:
         erased.append(i + len(erased))
         for j in range(i, 1, -1):
           self.field[j] = self.field[j - 1][:]
         self.field[0] = [0] * self.sx
+      else:
+        i -= 1
     
     return erased
 
