@@ -11,6 +11,33 @@ pygame.mixer = None
 
 screensize = (1024, 768)
 
+
+class Texture:
+  def __init__(self, texturename):
+    self.name = texturename
+    self.Surface = pygame.image.load('../data/%s.png' % texturename)
+
+    (self.w, self.h) = self.Surface.get_rect()[2:]
+
+    self.glID = glGenTextures(1)
+    self.bind()
+
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1)
+    glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_S,     GL_REPEAT)
+    glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_WRAP_T,     GL_REPEAT)
+
+    glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+    glTexParameterf(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA,
+                 self.w, self.h,
+                 0, GL_RGBA, GL_UNSIGNED_BYTE,
+                 pygame.image.tostring(self.Surface, "RGBA", 0))
+
+  def bind(self):
+    glBindTexture(GL_TEXTURE_2D, self.glID)
+
+
 def setres((width, height)):
   """res = tuple
 sets the resolution and sets up the projection matrix"""
@@ -34,22 +61,35 @@ def init():
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
   glEnable(GL_DEPTH_TEST)
   #glEnable(GL_LINE_SMOOTH)
-  #glEnable(GL_TEXTURE_2D)
-  glClearColor(0.8,0.9,1.0,1.0)
+  glEnable(GL_TEXTURE_2D)
+  glClearColor(0.0,0.0,0.0,1.0)
 
 def quad(x, y):
   glPushMatrix()
+
+  glEnable(GL_TEXTURE_2D)
   
+  t = (time.time() / 100) % 1 
+
   glTranslatef(x, y, 0)
   glBegin(GL_QUADS)
 
+  glTexCoord2f(x * 0.05, y * 0.05 + t)
   glVertex2i(0, 0)
+
+  glTexCoord2f(x * 0.05, y * 0.05 + 0.05 + t)
   glVertex2i(0, 1)
+
+  glTexCoord2f(x * 0.05 + 0.05, y * 0.05 + 0.05 + t)
   glVertex2i(1, 1)
+
+  glTexCoord2f(x * 0.05 + 0.05, y * 0.05 + t)
   glVertex2i(1, 0)
 
   glEnd()
   
+  glDisable(GL_TEXTURE_2D)
+
   glPopMatrix()
 
 def line(x1, y1, x2, y2):
@@ -66,6 +106,8 @@ def rungame():
   gf = field.GameField()
   gf.colors = [(1, 0, 0), (1, 1, 0), (1, 0, 1), (0, 1, 1), (0, 1, 0), (0, 0, 1)]
   gf.newPiece()
+
+  piecetex = Texture("bg")
 
   lastdrop = time.time()
   dropdelay = 1
@@ -106,20 +148,20 @@ def rungame():
           if tf[y][x] != 0:
             glColor(*tf[y][x])
             quad(x, y)
-            glColor(0, 0, 0)
+            glColor(1, 1, 1)
             if x < gf.sx - 1 and tf[y][x + 1] != tf[y][x]:
               line(x + 1, y, x + 1, y + 1)
             if y < gf.sy - 1 and tf[y+1][x] != tf[y][x]:
               line(x, y + 1, x + 1, y + 1)
           else:
-            glColor(0, 0, 0)
+            glColor(1, 1, 1)
             if x < gf.sx - 1 and tf[y][x + 1] != 0:
               line(x + 1, y, x + 1, y + 1)
             if y < gf.sy - 1 and tf[y+1][x] != 0:
               line(x, y + 1, x + 1, y + 1)
-      
 
-      glColor3f(0, 0, 0)
+
+      glColor3f(1, 1, 1)
       glBegin(GL_LINE_LOOP)
 
       glVertex3i(0, 0, 1)
