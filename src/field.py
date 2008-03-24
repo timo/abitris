@@ -64,6 +64,8 @@ class GameField:
     # or something.
     self.field = [[0 for i in range(self.sx)] for j in range(self.sy)]
 
+    self.playerscore = 0
+
   def newPiece(self):
     """selects a new piece from the PieceList and drops it into
 the game field"""
@@ -100,7 +102,9 @@ the game field"""
         self.field[0] = [0] * self.sx
       else:
         i -= 1
-    
+
+    self.playerscore += [0, 200, 450, 1000, 2100][len(erased)]
+
     return erased
 
   def collides(self, newx, newy, newpaf):

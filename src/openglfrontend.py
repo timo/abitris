@@ -116,8 +116,9 @@ def rungame():
   lastdrop = time.time()
   dropdelay = 0.3
 
-  textthing = Text(u"Nächstes Teil")
+  nextpiece = Text(u"Nächstes Teil")
 
+  scoredisplay = Text("0 Punkte")
 
   def drawStuff(tf):
     def drawField(thefield):
@@ -164,9 +165,11 @@ def rungame():
 
     # render GUI
     glPushMatrix()
-    glTranslatef(12, 0, 0)
+    glTranslate(12, 0, 0)
     glScalef(1 / 32., 1 / 32., 1 / 32.)
-    textthing.draw()
+    nextpiece.draw()
+    glTranslate(0, 6 * 32, 0)
+    scoredisplay.draw()
     glPopMatrix()
 
     # render next piece
@@ -184,7 +187,6 @@ def rungame():
     glVertex3i(0, len(gf.npiece[gf.npaf][0]), 1)
     glEnd()
 
-    
     glPopMatrix()
 
   inputsys = {K_LEFT:  [gf.move,   [-1, 0], time.time()],
@@ -224,6 +226,8 @@ def rungame():
               drawStuff(oldfield)
               pygame.display.flip()
               time.sleep(0.025)
+          
+          scoredisplay.renderText("%i Punkte" % gf.playerscore)
 
       drawStuff(gf.combinedField( map(lambda col: col * (math.sin(time.time() * 3) + 1.25), gf.pc )))
       pygame.display.flip()
