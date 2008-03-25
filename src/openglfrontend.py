@@ -129,6 +129,9 @@ def rungame():
   bonuspos = 0
   bonuszeit = 0
 
+  gameends = time.time() + 5 * 60
+  timedisplay = Text("5:00")
+
   def drawStuff(tf):
     def drawField(thefield):
       for y in range(len(thefield)):
@@ -181,6 +184,9 @@ def rungame():
     scoredisplay.draw()
     glTranslate(0, 32, 0)
     linesdisplay.draw()
+    glTranslate(0, 64, 0)
+    glScalef(2, 2, 1)
+    timedisplay.draw()
     glPopMatrix()
 
     # render next piece
@@ -226,6 +232,8 @@ def rungame():
         if pygame.key.get_pressed()[thekey] and time.time() > inputsys[thekey][2] + inputdelay:
           inputsys[thekey][0](*inputsys[thekey][1])
           inputsys[thekey][2] = time.time()
+
+      timedisplay.renderText("%i:%i" % ((gameends - time.time()) / 60, (gameends - time.time()) % 60))
 
       if time.time() > lastdrop + dropdelay:
         lastdrop = time.time()
