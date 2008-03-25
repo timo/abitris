@@ -6,6 +6,7 @@ from math import log, ceil
 pygame.font.init()
 thefont = pygame.font.SysFont("arial", 32)
 bigfont = pygame.font.SysFont("arial", 42)
+hugefont = pygame.font.SysFont("arial", 96)
 
 class Text:
   def __init__(self, thetext, font = thefont):
