@@ -111,6 +111,9 @@ def rungame():
   gf.newPiece()
   gf.newPiece()
 
+  fragen = random.shuffle([a.split(":") for a in open("../data/questions.txt").readlines()])
+  nextquestion = time.time() + 60
+
   piecetex = Texture("bg")
 
   lastdrop = time.time()

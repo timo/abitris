@@ -1,0 +1,4 @@
+j:Sag mal ja!
+n:Sag mal nein!
+n:Regiert Hitler noch in Deutschland?
+j:Ist die Relativitätstheorie für den Ottonormalverbraucher relevant?
