@@ -17,7 +17,10 @@ class PieceList:
     # two-dimensional semiboolean fields for the field itself, each
     # part of the list being one step in the rotation of the piece.
     self.piecelist = []
-    pieces = open("../data/pieces.txt", "r").read().split("\n\n")
+    try:
+      pieces = open("../data/pieces.txt", "r").read().split("\n\n")
+    except:
+      pieces = open("data/pieces.txt", "r").read().split("\n\n")
     for p in (a.split("\n") for a in pieces):
       clr = [int(a) for a in p[0].split(" ")]
       if p[-1] != "":

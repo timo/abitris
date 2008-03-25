@@ -17,7 +17,10 @@ screensize = (1024, 768)
 class Texture:
   def __init__(self, texturename):
     self.name = texturename
-    self.Surface = pygame.image.load('../data/%s.png' % texturename)
+    try:
+      self.Surface = pygame.image.load('../data/%s.png' % texturename)
+    except:
+      self.Surface = pygame.image.load('data/%s.png' % texturename)
 
     (self.w, self.h) = self.Surface.get_rect()[2:]
 
@@ -171,7 +174,7 @@ def rungame():
 
     # render GUI
     glPushMatrix()
-    glTranslate(12, 0, 0)
+    glTranslate(gf.sx + 1, 1, 0)
     glScalef(1 / 32., 1 / 32., 1 / 32.)
     nextpiece.draw()
     glTranslate(0, 7 * 32, 0)
@@ -183,7 +186,7 @@ def rungame():
     # render next piece
     glPushMatrix()
     piecetex.bind()
-    glTranslatef(12, 1, 0)
+    glTranslatef(gf.sx + 1, 2, 0)
     drawField([map( lambda foo: [0, gf.npc][foo], bar) for bar in gf.npiece[gf.npaf]])
 
     glDisable(GL_TEXTURE_2D)
