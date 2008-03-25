@@ -2,7 +2,7 @@
 from OpenGL.GL import *
 import pygame
 from pygame.locals import *
-from font import Text
+from font import Text, bigfont
 import time 
 
 import field
@@ -125,7 +125,7 @@ def rungame():
 
   scoredisplay = Text("0 Punkte")
   linesdisplay = Text("0 Zeilen")
-  bonusdisplay = Text("Spielbeginn!")
+  bonusdisplay = Text("Spielbeginn!", bigfont)
   bonuspos = 10
   bonuszeit = time.time()
 
