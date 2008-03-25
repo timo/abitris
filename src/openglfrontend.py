@@ -240,6 +240,8 @@ def rungame():
           inputsys[thekey][2] = time.time()
 
       timedisplay.renderText("%i:%i" % ((gameends - time.time()) / 60, (gameends - time.time()) % 60))
+      if time.time() > gameends:
+        raise field.GameOver
 
       if time.time() > lastdrop + dropdelay:
         lastdrop = time.time()
