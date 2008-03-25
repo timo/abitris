@@ -131,9 +131,9 @@ def rungame():
 
   scoredisplay = Text("0 Punkte")
   linesdisplay = Text("0 Zeilen")
-  bonusdisplay = Text("")
-  bonuspos = 0
-  bonuszeit = 0
+  bonusdisplay = Text("Spielbeginn!")
+  bonuspos = 10
+  bonuszeit = time.time()
 
   gameends = time.time() + 5 * 60
   timedisplay = Text("5:00")
@@ -214,7 +214,7 @@ def rungame():
 
     if time.time() < bonuszeit + 3:
       glPushMatrix()
-      glTranslatef(gf.sx / 2, bonuspos - (time.time() - bonuszeit), 2)
+      glTranslatef(0.5 + gf.sx / 2 - bonusdisplay.w / 32, bonuspos - (time.time() - bonuszeit), 2)
       bonusdisplay.rgba = [1, 1, 1, 1. - ((time.time() - bonuszeit) / 3.) ** 2]
       glScalef(1/16., 1/16., 1)
       bonusdisplay.draw()
@@ -278,6 +278,9 @@ def rungame():
       if time.time() > lastspeedincrease + 60:
         dropdelay *= 0.8
         lastspeedincrease = time.time()
+        bonuspos = gf.sy / 2
+        bonuszeit = time.time()
+        bonusdisplay.renderText("Schneller!")
 
   except field.GameOver:
     pass # TODO: implement some game-over stuff
