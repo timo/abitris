@@ -238,7 +238,10 @@ def rungame():
     if ctime < bonuszeit + 3:
       glPushMatrix()
       glTranslatef(0.5 + gf.sx / 2 - bonusdisplay.w / 32, bonuspos - (ctime - bonuszeit), 2)
-      bonusdisplay.rgba = [1, 1, 1, 1. - ((ctime - bonuszeit) / 3.) ** 2]
+      if bonusdisplay.currenttext[0] == "-":
+        bonusdisplay.rgba = [1, 0, 0, 1. - ((ctime - bonuszeit) / 3.) ** 2]
+      else:
+        bonusdisplay.rgba = [1, 1, 1, 1. - ((ctime - bonuszeit) / 3.) ** 2]
       glScalef(1/16., 1/16., 1)
       bonusdisplay.draw()
       glPopMatrix()
@@ -270,11 +273,27 @@ def rungame():
       for event in pygame.event.get():
         if event.type == QUIT:
           running = False
+        elif event.type == KEYDOWN:
+          if event.key in [K_q, K_e] and displayFrage:
+            displayFrage = False
+            if (event.key == K_q and richtigLinks) or (event.key == K_e and not richtigLinks):
+              gf.playerscore += 1000
+              bonuspos = 5
+              bonuszeit = ctime
+              bonusdisplay.renderText("+1000")
+            else:
+              gf.playerscore -= 1000
+              bonuspos = 5
+              bonuszeit = ctime
+              bonusdisplay.renderText("-1000")
+            
+            nextquestion = ctime + 60
 
-      for thekey in inputsys.keys():
-        if pygame.key.get_pressed()[thekey] and ctime > inputsys[thekey][2] + inputdelay:
-          inputsys[thekey][0](*inputsys[thekey][1])
-          inputsys[thekey][2] = ctime
+      if not displayFrage:
+        for thekey in inputsys.keys():
+          if pygame.key.get_pressed()[thekey] and ctime > inputsys[thekey][2] + inputdelay:
+            inputsys[thekey][0](*inputsys[thekey][1])
+            inputsys[thekey][2] = ctime
 
       timedisplay.renderText("%i:%i" % ((gameends - time.time()) / 60, (gameends - time.time()) % 60))
       if time.time() > gameends:
