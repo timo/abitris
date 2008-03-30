@@ -9,6 +9,8 @@ import field
 import random
 from math import sin, cos
 
+import codecs
+
 # don't initialise sound stuff plzkthxbai
 pygame.mixer = None
 
@@ -113,18 +115,33 @@ def rungame():
   init()
   ctime = time.time()
 
-  
-
   gf = field.GameField()
   gf.colors = [(1, 0, 0), (1, 1, 0), (1, 0, 1), (0, 1, 1), (0, 1, 0), (0, 0, 1), (1, 0.7, 0)]
   gf.newPiece()
   gf.newPiece()
 
   try:
-    fragen = random.shuffle([a.split(":") for a in open("../data/questions.txt").readlines()])
+    fragen = [a.strip().split(":") for a in codecs.open("../data/questions.txt", encoding="utf-8").readlines()]
   except:
-    fragen = random.shuffle([a.split(":") for a in open("data/questions.txt").readlines()])
-  nextquestion = time.time() + 60
+    fragen = [a.strip().split(":") for a in codecs.open("data/questions.txt", encoding="utf-8").readlines()]
+  
+  for fg in fragen:
+    if "|" in fg[2]:
+      fg[2] = fg[2].split("|")
+    else:
+      fg[2] = [fg[2], ""]
+
+  random.shuffle(fragen)
+  nextquestion = time.time() + 1
+
+  momentaneFrage = None
+  richtigLinks = random.choice([True,False])
+  displayFrage = False
+
+  frage1Display   = Text("")
+  frage2Display   = Text("")
+  Antwort1Display = Text("")
+  Antwort2Display = Text("")
 
   piecetex = Texture("bg")
 
@@ -226,6 +243,19 @@ def rungame():
       bonusdisplay.draw()
       glPopMatrix()
 
+    if displayFrage:
+      glPushMatrix()
+      glTranslatef(gf.sx + 3, gf.sy / 2 + 3, 3)
+      glScalef(1/32., 1/32., 1/32.)
+      frage1Display.draw()
+      glTranslatef(0, 32, 0)
+      frage2Display.draw()
+      glTranslatef(0, 64, 0)
+      Antwort1Display.draw()
+      glTranslatef(10 * 32, 0, 0)
+      Antwort2Display.draw()
+      glPopMatrix()
+
   inputsys = {K_a:     [gf.rotate, [-1],    ctime],
               K_d:     [gf.rotate, [ 1],    ctime],
               K_LEFT:  [gf.move,   [-1, 0], ctime],
@@ -284,13 +314,23 @@ def rungame():
       pygame.display.flip()
 
       time.sleep(0.01)
-      
+
       if ctime > lastspeedincrease + 60:
         dropdelay *= 0.8
         lastspeedincrease = ctime
         bonuspos = gf.sy / 2
         bonuszeit = ctime
         bonusdisplay.renderText("Schneller!")
+
+      if ctime > nextquestion:
+        momentaneFrage = fragen.pop()
+        richtigLinks = random.choice([True,False])
+        displayFrage = True
+        frage1Display.renderText(momentaneFrage[2][0])
+        frage2Display.renderText(momentaneFrage[2][1])
+        Antwort1Display.renderText(momentaneFrage[richtigLinks])
+        Antwort2Display.renderText(momentaneFrage[not richtigLinks])
+        nextquestion = ctime + 5 * 60
 
     except field.GameOver:
 
@@ -304,25 +344,27 @@ def rungame():
                   K_LEFT:  [gf.move,   [-1, 0], ctime],
                   K_RIGHT: [gf.move,   [ 1, 0], ctime],
                   K_DOWN:  [gf.move,   [ 0, 1], ctime]}
-  
+
       displaying = True
       gameover = Text("Game Over!", hugefont)
       gameover.rgba = (1, 0, 0, 1)
       overscore = Text("%i Punkte" % gf.playerscore, hugefont)
-    
+
+      gameovertime = ctime
+
       while displaying:
         ctime = time.time()
-    
+
         for event in pygame.event.get():
           if event.type == QUIT:
             displaying = False
             running = False
-          elif event.type == KEYDOWN:
+          elif event.type == KEYDOWN and ctime > gameovertime + 5:
             displaying = False
-    
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
         glLoadIdentity()
-    
+
         glPushMatrix()
         glTranslatef(16 + cos(ctime * 2), 9 - sin(ctime * 3), 1)
         glRotatef(sin(cos(ctime * 4)) * 33, 0, 0, 1)
@@ -331,13 +373,13 @@ def rungame():
         gameover.rgba = (1, 0, 0, sin(ctime) * 0.3 + 0.7)
         gameover.draw()
         glPopMatrix()
-    
+
         glPushMatrix()
         glTranslatef(16 - overscore.w / 64, 14 - overscore.h / 64, 2)
         glScalef(1/32., 1/32., 1)
         overscore.draw()
         glPopMatrix()
-    
+
         pygame.display.flip()
         time.sleep(0.01)
 

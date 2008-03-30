@@ -1,4 +1,18 @@
-j:Sag mal ja!
-n:Sag mal nein!
-n:Regiert Hitler noch in Deutschland?
-j:Ist die Relativitätstheorie für den Ottonormalverbraucher relevant?
+27:24:Wie viele Länder sind Mitglied in der EU?
+82:80:Wie viele Einwohner hat Deutschland (in Mio)?
+89:95:Wie viele Schüler sind in der Stufe 13?
+1992:1989:Seit wann ist das QGN eine gemischte Schule?
+1979:1976:Seit wann findet der Unterricht am QGN auf der Sternstr. statt?
+1337:1300:Wie viele Schüler gehen zurzeit am QGN zur Schule?
+England:Niederlande:Welche berühmte Fußballnation nimmt nicht an der|EM teil?
+Hannawald:Ahonen:Wer gewann als einziger Gewinner der Vierschanzen-|tournee alle vier Springen in einem Wettbewerb?
+Süd Afrika:Brasilien:Wo findet die nächste Fußball|Weltmeisterschaft statt?
+Arnold Schwar.:Samuel L. Jackson:Wer ist aktuell Gouverneur des Bundesstaates|Kalifornien?
+50:52:Wie viele Bundesstaaten haben die USA?
+1961:1989:Wann wurde in Deutschland die Mauer errichtet?
+Tobias Regner:Mark Medlock:Wie heißt der Gewinner der 3. DSDS Staffel?
+Georg Hackl:Stefan Raab:Wer ist der aktuelle Wok-Weltmeister?
+Suri:Summer:Wie heißt das Kind von Tom Cruise und Katie Holmes?
+Bettina:Martina:Wie lautet der aktuelle Song von Fettes Brot?
+Shakira:Nelly Furtado:Wem stand Timbaland nicht als Produzent zur Seite?
+5:4:Wie viele Mitglieder haben die Backstreet Boys?
