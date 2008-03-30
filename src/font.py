@@ -4,20 +4,23 @@ from pygame.locals import *
 from math import log, ceil
 
 pygame.font.init()
-thefont = pygame.font.SysFont("arial", 26)
+thefont = pygame.font.SysFont("arial", 32)
+bigfont = pygame.font.SysFont("arial", 42)
+hugefont = pygame.font.SysFont("arial", 96)
 
 class Text:
-  def __init__(self, thetext):
+  def __init__(self, thetext, font = thefont):
     self.glID = None
     self.rgba = (1., 1., 1., 1.)
     self.currenttext = None
+    self.font = font
     self.renderText(thetext)
 
   def renderText(self, thetext):
     if self.currenttext == thetext:
       return False
     self.currenttext = thetext
-    text = thefont.render(thetext, True, (255, 255, 255)).convert_alpha()
+    text = self.font.render(thetext, True, (255, 255, 255)).convert_alpha()
     npo2 = lambda x: int(2 ** ceil(log(x, 2)))
     (w, h) = (npo2(text.get_width()), npo2(text.get_height()))
 

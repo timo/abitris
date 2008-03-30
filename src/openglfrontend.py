@@ -2,17 +2,19 @@
 from OpenGL.GL import *
 import pygame
 from pygame.locals import *
-from font import Text
+from font import Text, bigfont, hugefont
 import time 
 
 import field
 import random
-import math
+from math import sin, cos
 
 # don't initialise sound stuff plzkthxbai
 pygame.mixer = None
 
 screensize = (1024, 768)
+
+ctime = 0
 
 class Texture:
   def __init__(self, texturename):
@@ -74,7 +76,7 @@ def quad(x, y):
 
   glEnable(GL_TEXTURE_2D)
 
-  t = (time.time() / 100) % 1 
+  t = (ctime / 100) % 1 
   z = 0.05
 
   glTranslatef(x, y, 0)
@@ -107,7 +109,11 @@ def line(x1, y1, x2, y2):
   glEnd()
 
 def rungame():
+  global ctime
   init()
+  ctime = time.time()
+
+  
 
   gf = field.GameField()
   gf.colors = [(1, 0, 0), (1, 1, 0), (1, 0, 1), (0, 1, 1), (0, 1, 0), (0, 0, 1), (1, 0.7, 0)]
@@ -122,18 +128,18 @@ def rungame():
 
   piecetex = Texture("bg")
 
-  lastdrop = time.time()
+  lastdrop = ctime
   dropdelay = 0.6
 
-  lastspeedincrease = time.time()
+  lastspeedincrease = ctime
 
   nextpiece = Text(u"Nächstes Teil")
 
   scoredisplay = Text("0 Punkte")
   linesdisplay = Text("0 Zeilen")
-  bonusdisplay = Text("Spielbeginn!")
+  bonusdisplay = Text("Spielbeginn!", bigfont)
   bonuspos = 10
-  bonuszeit = time.time()
+  bonuszeit = ctime
 
   gameends = time.time() + 5 * 60
   timedisplay = Text("5:00")
@@ -212,39 +218,41 @@ def rungame():
 
     glPopMatrix()
 
-    if time.time() < bonuszeit + 3:
+    if ctime < bonuszeit + 3:
       glPushMatrix()
-      glTranslatef(0.5 + gf.sx / 2 - bonusdisplay.w / 32, bonuspos - (time.time() - bonuszeit), 2)
-      bonusdisplay.rgba = [1, 1, 1, 1. - ((time.time() - bonuszeit) / 3.) ** 2]
+      glTranslatef(0.5 + gf.sx / 2 - bonusdisplay.w / 32, bonuspos - (ctime - bonuszeit), 2)
+      bonusdisplay.rgba = [1, 1, 1, 1. - ((ctime - bonuszeit) / 3.) ** 2]
       glScalef(1/16., 1/16., 1)
       bonusdisplay.draw()
       glPopMatrix()
 
-  inputsys = {K_a:     [gf.rotate, [-1],    time.time()],
-              K_d:     [gf.rotate, [ 1],    time.time()],
-              K_LEFT:  [gf.move,   [-1, 0], time.time()],
-              K_RIGHT: [gf.move,   [ 1, 0], time.time()],
-              K_DOWN:  [gf.move,   [ 0, 1], time.time()]}
+  inputsys = {K_a:     [gf.rotate, [-1],    ctime],
+              K_d:     [gf.rotate, [ 1],    ctime],
+              K_LEFT:  [gf.move,   [-1, 0], ctime],
+              K_RIGHT: [gf.move,   [ 1, 0], ctime],
+              K_DOWN:  [gf.move,   [ 0, 1], ctime]}
   inputdelay = 0.15
 
-  try:
-    running = True
-    while running:
+  running = True
+  while running:
+    try:
+      ctime = time.time()
       for event in pygame.event.get():
         if event.type == QUIT:
           running = False
 
       for thekey in inputsys.keys():
-        if pygame.key.get_pressed()[thekey] and time.time() > inputsys[thekey][2] + inputdelay:
+        if pygame.key.get_pressed()[thekey] and ctime > inputsys[thekey][2] + inputdelay:
           inputsys[thekey][0](*inputsys[thekey][1])
-          inputsys[thekey][2] = time.time()
+          inputsys[thekey][2] = ctime
 
       timedisplay.renderText("%i:%i" % ((gameends - time.time()) / 60, (gameends - time.time()) % 60))
       if time.time() > gameends:
         raise field.GameOver
 
-      if time.time() > lastdrop + dropdelay:
-        lastdrop = time.time()
+      if ctime > lastdrop + dropdelay:
+        lastdrop = ctime
+
         if not gf.move(0, 1):
           oldfield = gf.combinedField()
           altepunkte = gf.playerscore
@@ -264,28 +272,74 @@ def rungame():
               time.sleep(0.025)
 
             bonuspos = deletedlines[len(deletedlines) / 2]
-            bonuszeit = time.time()
+            bonuszeit = ctime
             bonusdisplay.renderText("%s%i" % (["", "+"][gf.playerscore - altepunkte > 0], gf.playerscore - altepunkte))
 
-            lastdrop = time.time()
+            lastdrop = ctime
 
           scoredisplay.renderText("%i Punkte" % gf.playerscore)
           linesdisplay.renderText("%i Zeilen" % gf.linescleared)
 
-      drawStuff(gf.combinedField( map(lambda col: col * (math.sin(time.time() * 3) + 1.25), gf.pc )))
+      drawStuff(gf.combinedField( map(lambda col: col * (sin(ctime * 3) + 1.25), gf.pc )))
       pygame.display.flip()
 
       time.sleep(0.01)
       
-      if time.time() > lastspeedincrease + 60:
+      if ctime > lastspeedincrease + 60:
         dropdelay *= 0.8
-        lastspeedincrease = time.time()
+        lastspeedincrease = ctime
         bonuspos = gf.sy / 2
-        bonuszeit = time.time()
+        bonuszeit = ctime
         bonusdisplay.renderText("Schneller!")
 
-  except field.GameOver:
-    pass # TODO: implement some game-over stuff
+    except field.GameOver:
+
+      gf = field.GameField()
+      gf.colors = [(1, 0, 0), (1, 1, 0), (1, 0, 1), (0, 1, 1), (0, 1, 0), (0, 0, 1), (1, 0.7, 0)]
+      gf.newPiece()
+      gf.newPiece()
+
+      inputsys = {K_a:     [gf.rotate, [-1],    ctime],
+                  K_d:     [gf.rotate, [ 1],    ctime],
+                  K_LEFT:  [gf.move,   [-1, 0], ctime],
+                  K_RIGHT: [gf.move,   [ 1, 0], ctime],
+                  K_DOWN:  [gf.move,   [ 0, 1], ctime]}
+  
+      displaying = True
+      gameover = Text("Game Over!", hugefont)
+      gameover.rgba = (1, 0, 0, 1)
+      overscore = Text("%i Punkte" % gf.playerscore, hugefont)
+    
+      while displaying:
+        ctime = time.time()
+    
+        for event in pygame.event.get():
+          if event.type == QUIT:
+            displaying = False
+            running = False
+          elif event.type == KEYDOWN:
+            displaying = False
+    
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glLoadIdentity()
+    
+        glPushMatrix()
+        glTranslatef(16 + cos(ctime * 2), 9 - sin(ctime * 3), 1)
+        glRotatef(sin(cos(ctime * 4)) * 33, 0, 0, 1)
+        glTranslatef(-gameover.w / 64, -gameover.h / 64, 0)
+        glScalef((1 + sin(ctime) * 0.2)/32., (1 + cos(ctime) * 0.2)/32., 1)
+        gameover.rgba = (1, 0, 0, sin(ctime) * 0.3 + 0.7)
+        gameover.draw()
+        glPopMatrix()
+    
+        glPushMatrix()
+        glTranslatef(16 - overscore.w / 64, 14 - overscore.h / 64, 2)
+        glScalef(1/32., 1/32., 1)
+        overscore.draw()
+        glPopMatrix()
+    
+        pygame.display.flip()
+        time.sleep(0.01)
 
   pygame.quit
 
