@@ -278,6 +278,11 @@ def rungame():
 
     except field.GameOver:
 
+      displaying = True
+      gameover = Text("Game Over!", hugefont)
+      gameover.rgba = (1, 0, 0, 1)
+      overscore = Text("%i Punkte" % gf.playerscore, hugefont)
+
       gf = field.GameField()
       gf.colors = [(1, 0, 0), (1, 1, 0), (1, 0, 1), (0, 1, 1), (0, 1, 0), (0, 0, 1), (1, 0.7, 0)]
       gf.newPiece()
@@ -288,11 +293,6 @@ def rungame():
                   K_LEFT:  [gf.move,   [-1, 0], ctime],
                   K_RIGHT: [gf.move,   [ 1, 0], ctime],
                   K_DOWN:  [gf.move,   [ 0, 1], ctime]}
-  
-      displaying = True
-      gameover = Text("Game Over!", hugefont)
-      gameover.rgba = (1, 0, 0, 1)
-      overscore = Text("%i Punkte" % gf.playerscore, hugefont)
     
       while displaying:
         ctime = time.time()
