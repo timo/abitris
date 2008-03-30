@@ -286,8 +286,6 @@ def rungame():
               bonuspos = 5
               bonuszeit = ctime
               bonusdisplay.renderText("-1000")
-            
-            nextquestion = ctime + 60
 
       if not displayFrage:
         for thekey in inputsys.keys():
@@ -343,6 +341,12 @@ def rungame():
         bonusdisplay.renderText("Schneller!")
 
       if ctime > nextquestion:
+        if displayFrage == True:
+          gf.playerscore -= 1250
+          bonuspos = 5
+          bonuszeit = ctime
+          bonusdisplay.renderText("-1250")
+        
         momentaneFrage = fragen.pop()
         richtigLinks = random.choice([True,False])
         displayFrage = True
@@ -350,7 +354,7 @@ def rungame():
         frage2Display.renderText(momentaneFrage[2][1])
         Antwort1Display.renderText(momentaneFrage[richtigLinks])
         Antwort2Display.renderText(momentaneFrage[not richtigLinks])
-        nextquestion = ctime + 5 * 60
+        nextquestion = ctime + 30
 
     except field.GameOver:
 
