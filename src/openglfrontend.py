@@ -316,6 +316,7 @@ def rungame():
                   if oldfield[l][zx] == (0, 0, 0):
                     oldfield[l][zx] = [0]
 
+              ctime = time.time()
               drawStuff(oldfield)
               pygame.display.flip()
               time.sleep(0.025)
